@@ -1,3 +1,18 @@
+use std::{env, process};
+use killfeed::Config;
+
+
 fn main() {
-    println!("Hello, world!");
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        eprintln!("problem parsing args: {}", err);
+        process::exit(1);
+    });
+
+    if let Err(e) = killfeed::run(config) {
+        eprintln!("application failure: {}", e);
+        process::exit(1);
+    };
 }
+
