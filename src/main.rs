@@ -5,12 +5,17 @@ use killfeed::Config;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let config = Config::new(&args).unwrap_or_else(|err| {
-        eprintln!("problem parsing args: {}", err);
+    let config = Config::new().unwrap_or_else(|err| {
+        eprintln!("problem loading config: {}", err);
         process::exit(1);
     });
 
-    if let Err(e) = killfeed::run(config) {
+    if args.len() != 2 {
+        eprintln!("problem parsing args");
+        process::exit(1);
+    }
+
+    if let Err(e) = killfeed::run(config, &args[1]) {
         eprintln!("application failure: {}", e);
         process::exit(1);
     };
