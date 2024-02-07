@@ -1,3 +1,3 @@
 # Killfeed
 
-Poem is Personal Helicon by Seamus Heaney.
+Attempting to build a lightweight CLI Worklog tool.
