@@ -1,12 +1,21 @@
+mod head;
+
 use std::{env, error::Error, fs::{OpenOptions}, io::Write};
 use chrono::prelude::*;
 
-pub fn run(config: Config, entry: &String) -> Result<(), Box<dyn Error>> {
+pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
+    match args[1].as_str() {
+        "head" => head::head(config.filepath),
+        _ => append(config, &args[1])
+    }
+}
+
+fn append(config: Config, entry: &String) -> Result<(), Box<dyn Error>> {
     let file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(config.filepath)
-        .unwrap();
+    .create(true)
+    .append(true)
+    .open(config.filepath)
+    .unwrap();
 
     let time: DateTime<Local> = Local::now();
     let time = time.format("%a %b %e %Y %T").to_string();

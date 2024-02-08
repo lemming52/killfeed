@@ -1,4 +1,5 @@
 use std::{env, process};
+
 use killfeed::Config;
 
 
@@ -10,12 +11,9 @@ fn main() {
         process::exit(1);
     });
 
-    if args.len() != 2 {
-        eprintln!("problem parsing args");
-        process::exit(1);
-    }
 
-    if let Err(e) = killfeed::run(config, &args[1]) {
+
+    if let Err(e) = killfeed::run(config, &args) {
         eprintln!("application failure: {}", e);
         process::exit(1);
     };
