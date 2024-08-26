@@ -7,7 +7,8 @@ use itertools::Itertools;
 
 
 static EDITOR_TEMPLATE: &str = "
-# Write your note above";
+# Please enter the message for your work log. Lines starting
+# with '#' will be ignored, and an empty message aborts the notation";
  
 pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
     match args[1].as_str() {
@@ -37,10 +38,13 @@ fn default(config: Config) -> Result<(), Box<dyn Error>> {
         Err(e) => return Err(e)?,
     };
     let entry = lines.lines()
-        .filter(|l| !l.starts_with("#"))
+        .filter(|l| !l.starts_with("#") & !l.is_empty())
         .map(|l| l.trim())
         .join(" ");
-    append(config, &entry)
+    if entry != "" {
+        return append(config, &entry)
+    }
+    Ok(())
 }
 
 pub struct Config {
