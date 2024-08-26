@@ -11,10 +11,12 @@ static EDITOR_TEMPLATE: &str = "
 # with '#' will be ignored, and an empty message aborts the notation";
  
 pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
+    if args.len() == 1 {
+        return default(config)
+    }
     match args[1].as_str() {
         "head" => head::head(config.filepath),
-        "-m" => append(config, &args[1]),
-        _ => default(config)
+        _ => append(config, &args[1]),
     }
 }
 
@@ -46,6 +48,7 @@ fn default(config: Config) -> Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
+
 
 pub struct Config {
     pub filepath: String,
