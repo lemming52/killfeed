@@ -2,11 +2,18 @@ mod head;
 
 use std::{env, error::Error, fs::{OpenOptions}, io::Write};
 use chrono::prelude::*;
+use edit::edit;
+use itertools::Itertools;
 
+
+static EDITOR_TEMPLATE: &str = "
+# Write your note above";
+ 
 pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
     match args[1].as_str() {
         "head" => head::head(config.filepath),
-        _ => append(config, &args[1])
+        "-m" => append(config, &args[1]),
+        _ => default(config)
     }
 }
 
@@ -21,6 +28,19 @@ fn append(config: Config, entry: &String) -> Result<(), Box<dyn Error>> {
     let time = time.format("%a %b %e %Y %T").to_string();
     writeln!(&file, "[{}] {}", time, entry)?;
     Ok(())
+}
+
+fn default(config: Config) -> Result<(), Box<dyn Error>> {
+    let lines =  match edit(EDITOR_TEMPLATE)
+    {
+        Ok(entry)  =>  entry,
+        Err(e) => return Err(e)?,
+    };
+    let entry = lines.lines()
+        .filter(|l| !l.starts_with("#"))
+        .map(|l| l.trim())
+        .join(" ");
+    append(config, &entry)
 }
 
 pub struct Config {
