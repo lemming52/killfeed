@@ -5,6 +5,7 @@ use edit::edit;
 use itertools::Itertools;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
+use uuid::Uuid;
 
 
 static EDITOR_TEMPLATE: &str = "
@@ -34,6 +35,7 @@ fn append(config: Config, text: &String) -> Result<(), Box<dyn Error>> {
     .unwrap();
 
     let entry = Entry {
+        id: Uuid::new_v4(),
         text: text.to_string(),
         timestamp: Utc::now(),
     };
@@ -83,6 +85,7 @@ impl Config {
 
 #[derive(Serialize, Deserialize)]
 pub struct Entry {
+    pub id: Uuid,
     pub text: String,
     #[serde(serialize_with = "serialize", deserialize_with  = "deserialize")]
     pub timestamp: DateTime<Utc>,
