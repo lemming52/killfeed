@@ -37,4 +37,15 @@ To view the recent worklog, use the head command:
 
 ```
 $ kf head
+[Sun Sep  1 2024 17:04:53] Headshot
+[Sun Sep  1 2024 17:05:12] Double Kill!
+[Sun Sep  1 2024 17:05:22] Triple Kill!
+[Sun Sep  1 2024 17:05:37] Ultrakill!!
+```
+
+#### Backup
+
+To backup the entries:
+```
+$ kf backup <newfilepath>
 ```
