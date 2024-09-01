@@ -2,8 +2,12 @@ mod head;
 
 use std::{env, error::Error, fs::{OpenOptions}, io::Write};
 use chrono::prelude::*;
+use chrono::Utc;
 use edit::edit;
 use itertools::Itertools;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde_json;
+
 
 
 static EDITOR_TEMPLATE: &str = "
@@ -20,16 +24,19 @@ pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn append(config: Config, entry: &String) -> Result<(), Box<dyn Error>> {
+fn append(config: Config, text: &String) -> Result<(), Box<dyn Error>> {
     let file = OpenOptions::new()
     .create(true)
     .append(true)
     .open(config.filepath)
     .unwrap();
 
-    let time: DateTime<Local> = Local::now();
-    let time = time.format("%a %b %e %Y %T").to_string();
-    writeln!(&file, "[{}] {}", time, entry)?;
+    let entry = Entry {
+        text: text.to_string(),
+        timestamp: Utc::now(),
+    };
+    let j = serde_json::to_string(&entry)?;
+    writeln!(&file, "{}", j)?;
     Ok(())
 }
 
@@ -63,4 +70,37 @@ impl Config {
         });
         Ok(Config {filepath})
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Entry {
+    pub text: String,
+    #[serde(serialize_with = "serialize", deserialize_with  = "deserialize")]
+    pub timestamp: DateTime<Utc>,
+}
+
+const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
+pub fn serialize<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let s = format!("{}", date.format(FORMAT));
+    serializer.serialize_str(&s)
+}
+
+pub fn deserialize<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    // let s = String::deserialize(deserializer)?;
+    let s: Option<String> = Option::deserialize(deserializer)?;
+    if let Some(s) = s {
+        return Ok(
+            Utc.datetime_from_str(&s, FORMAT)
+            .map_err(serde::de::Error::custom)?
+        )
+    }
+
+    Ok(Utc::now())
 }
