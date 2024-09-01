@@ -18,7 +18,11 @@ pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
     match args[1].as_str() {
         "head" => head(config.filepath, args),
         "backup" =>  backup(config, &args[2]),
-        _ => append(config, &args[1]),
+        "-m" => append(config, &args[2]),
+        _ => {
+            print!("unrecognised command");
+            Ok(())
+        }
     }
 }
 
