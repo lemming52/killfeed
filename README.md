@@ -2,11 +2,11 @@
 
 Attempting to build a lightweight CLI Worklog tool.
 
-## Usage
+## Usage
 
 ### Installation
 
-Currently only installation supported is by local cargo install:
+Currently the only installation method supported is by local cargo install:
 ```
 cargo install --path .
 ```
@@ -49,7 +49,6 @@ Optionally add a number of lines to print.
 $ killfeed head 1
 [Sun Sep  1 2024 17:05:37] Ultrakill!!
 ```
-
 
 #### Backup
 
