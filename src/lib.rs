@@ -1,6 +1,4 @@
-mod head;
-
-use std::{env, error::Error, fs::{OpenOptions}, io::Write};
+use std::{env, error::Error, fs::{self, OpenOptions}, io::Write};
 use chrono::prelude::*;
 use chrono::Utc;
 use edit::edit;
@@ -19,7 +17,8 @@ pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
         return default(config)
     }
     match args[1].as_str() {
-        "head" => head::head(config.filepath),
+        "head" => head(config.filepath),
+        "backup" =>  backup(config, &args[2]),
         _ => append(config, &args[1]),
     }
 }
@@ -38,6 +37,13 @@ fn append(config: Config, text: &String) -> Result<(), Box<dyn Error>> {
     let j = serde_json::to_string(&entry)?;
     writeln!(&file, "{}", j)?;
     Ok(())
+}
+
+fn backup(config: Config, filename: &String) -> Result<(), Box<dyn Error>> {
+    match fs::copy(config.filepath, filename) {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(e)?,
+    }
 }
 
 fn default(config: Config) -> Result<(), Box<dyn Error>> {
@@ -79,6 +85,13 @@ pub struct Entry {
     pub timestamp: DateTime<Utc>,
 }
 
+impl Entry {
+    fn print(&self) -> String {
+        let time = self.timestamp.format("%a %b %e %Y %T").to_string();
+        format!("[{}] {}", time, self.text)
+    }
+}
+
 const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 
 pub fn serialize<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
@@ -103,4 +116,21 @@ where
     }
 
     Ok(Utc::now())
+}
+
+pub fn head(filename: String) -> Result<(), Box<dyn Error>> {
+
+    let lines = fs::read_to_string(filename)?;
+    for line in lines.lines() {
+        let e: Option<Entry> = match serde_json::from_str (line) {
+            Ok (e) => e,
+            Err (_) => None
+        };
+        if let Some(e) = e {
+            println!("{}", e.print())
+        } else {
+            println!("{}", line)
+        }
+    }
+    Ok(())
 }
