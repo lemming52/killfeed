@@ -7,7 +7,6 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
 
 
-
 static EDITOR_TEMPLATE: &str = "
 # Please enter the message for your work log. Lines starting
 # with '#' will be ignored, and an empty message aborts the notation";
@@ -17,7 +16,7 @@ pub fn run(config: Config, args: &[String]) -> Result<(), Box<dyn Error>> {
         return default(config)
     }
     match args[1].as_str() {
-        "head" => head(config.filepath),
+        "head" => head(config.filepath, args),
         "backup" =>  backup(config, &args[2]),
         _ => append(config, &args[1]),
     }
@@ -118,10 +117,26 @@ where
     Ok(Utc::now())
 }
 
-pub fn head(filename: String) -> Result<(), Box<dyn Error>> {
+pub fn head(filename: String, args: &[String]) -> Result<(), Box<dyn Error>> {
+    let mut skip: usize = 0;
+    let f = fs::read_to_string(filename)?;
+    let lines = f.lines();
+    if args.len() >= 3 {
+        let count: usize = lines.count();
 
-    let lines = fs::read_to_string(filename)?;
-    for line in lines.lines() {
+        match args[2].parse::<usize>() {
+            Ok(n) => skip = n,
+            Err(_) => skip = count,
+        }
+        if skip < count {
+            skip = count - skip;
+        } else {
+            skip = 0;
+        }
+    }
+    
+
+    for line in f.lines().skip(skip) {
         let e: Option<Entry> = match serde_json::from_str (line) {
             Ok (e) => e,
             Err (_) => None

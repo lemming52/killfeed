@@ -43,6 +43,14 @@ $ kf head
 [Sun Sep  1 2024 17:05:37] Ultrakill!!
 ```
 
+Optionally add a number of lines to print.
+
+```
+$ kf head 1
+[Sun Sep  1 2024 17:05:37] Ultrakill!!
+```
+
+
 #### Backup
 
 To backup the entries:
