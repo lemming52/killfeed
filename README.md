@@ -22,13 +22,13 @@ appropriate editor (i.e. on OSX, `pico`).
 To add a note to the log, using the tool without arguments to open an editor and record a message:
 
 ```
-$ kf
+$ killfeed
 ```
 
 The `-m` flag can be used to skip the use of an editor.
 
 ```
-$ kf -m "Headshot the bug!"
+$ killfeed -m "Headshot the bug!"
 ```
 
 #### Reviewing
@@ -36,7 +36,7 @@ $ kf -m "Headshot the bug!"
 To view the recent worklog, use the head command:
 
 ```
-$ kf head
+$ killfeed head
 [Sun Sep  1 2024 17:04:53] Headshot
 [Sun Sep  1 2024 17:05:12] Double Kill!
 [Sun Sep  1 2024 17:05:22] Triple Kill!
@@ -46,7 +46,7 @@ $ kf head
 Optionally add a number of lines to print.
 
 ```
-$ kf head 1
+$ killfeed head 1
 [Sun Sep  1 2024 17:05:37] Ultrakill!!
 ```
 
@@ -55,5 +55,5 @@ $ kf head 1
 
 To backup the entries:
 ```
-$ kf backup <newfilepath>
+$ killfeed backup <newfilepath>
 ```
